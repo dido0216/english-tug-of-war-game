@@ -1,34 +1,27 @@
-# Magic Academy Tug of War
+# English Tug of War Games
 
-An interactive English tug-of-war game for Taiwanese junior high school (Grade 7) students.
+Two tug-of-war games for Grade 7 English classes in Taiwan (Beginner – Elementary, A1–A2), sharing the same bank of 58 original questions.
 
-Two wizard teams — **Azure Star** and **Crimson Phoenix** — answer English questions to pull the Crystal of Light toward their side. A correct answer pulls the crystal one step; a wrong answer passes the turn. The first team to pull the crystal into its rune circle wins.
+**Play online:** https://dido0216.github.io/english-tug-of-war-game/
 
-## Play online
+## The two versions
 
-Once GitHub Pages is enabled for this repository (Settings → Pages → Deploy from branch `main`, folder `/ (root)`), the game is playable at:
+| Page | Version | How it plays |
+| --- | --- | --- |
+| `index.html` | Home page | Describes both games and links to them |
+| `magic-academy.html` | 🪄 Magic Academy | Wizard-academy theme. Teams take turns answering — best for teacher-led lessons on a projector. Modes: Classic (15 pulls), Sudden Spell (5), Time Attack (60s) |
+| `adventure-island.html` | 🏝️ Adventure Island | Cute adventure theme. **Both teams play at the same time** on an interactive display — each team taps its own A–D panel; if both are correct, both score and the fastest tap pulls. Modes: Rainbow Trek, Lightning Trail, River Race |
 
-https://dido0216.github.io/english-tug-of-war-game/
+## Use offline
 
-## Play offline
+Download any game page and open it in Chrome or Edge — each file is self-contained and works without internet after it loads.
 
-Download `index.html` and open it in Chrome or Edge. The game is a single self-contained file — no server, backend, or account is needed. It loads a web font when online and falls back to system fonts offline.
+## Embed in Google Sites
 
-## Features
+1. Open your Google Site and choose **Insert → Embed → By URL**.
+2. Paste the address of the game page you want (home page, `magic-academy.html`, or `adventure-island.html`).
+3. Set it to full width with a tall height, preview, then **Publish**.
 
-- Teacher setup: team names, character choice, game mode (Classic / Sudden Death / Time Attack), question category, and difficulty
-- 58 original questions with student-friendly explanations: Be Verbs, Present Simple, Present Continuous, Pronouns & Possessives, Articles & Plurals, Prepositions, Question Words, Vocabulary, Sentence Ordering, Fun Translation (Chinese → English), and Spelling
-- No repeated questions in a game, shuffled answer options, sound effects with a mute button
-- Winner announcement with Play Again and Restart — no page refresh needed
-- Responsive layout for desktop, tablet, and mobile / classroom projectors
+## Add your own questions
 
-## Adding your own questions
-
-Open `index.html` in a text editor, find the `QUESTION_BANK` array in the script, and copy an existing question block. Keep the question, four options, correct answer, category, difficulty, and explanation fields filled in.
-
-## Embedding in Google Sites
-
-1. Copy the GitHub Pages URL above.
-2. In Google Sites, choose **Insert → Embed → By URL**.
-3. Paste the URL, insert it, and drag it to full width and a tall height.
-4. Preview on desktop, tablet, and phone, then publish.
+Open a game file in a text editor, find the `QUESTION_BANK` array in the script, and copy any question block: `cat`, `diff`, `q`, `zh`, `options` (4), `answer` (0–3), `explain`.
