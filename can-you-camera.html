@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Can You...? — Cute Camera Grammar Game | Grade 7 Taiwan</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --sky:#38BDF8; --sky2:#7DD3FC; --blue:#00AEEF; --yellow:#FFD93D; --yellow2:#FFC93C;
+  --pink:#FF5D8F; --pink2:#FF8FAB; --coral:#FF7B7B; --white:#FFFEF9; --ink:#1E2A4A; --green:#22C55E; --red:#EF4444;
+}
+html,body{height:100%;overflow:hidden}
+body{
+  font-family:"Baloo 2","Comic Sans MS","Chalkboard SE","Segoe UI Rounded",system-ui,sans-serif;
+  background:linear-gradient(180deg,#7DD3FC 0%,#BAE6FD 38%,#FEF9C3 78%,#FDE68A 100%);
+  color:var(--ink); display:flex; align-items:center; justify-content:center; position:relative;
+}
+body::before{content:"✦ ✧ ⭐ ✦ ✧ ⭐ ✦";position:absolute;top:10px;left:0;right:0;text-align:center;letter-spacing:18px;opacity:.55;font-size:18px;pointer-events:none}
+.cloud{position:absolute;background:#fff;border-radius:999px;opacity:.9;pointer-events:none;filter:drop-shadow(0 6px 0 rgba(255,255,255,.6))}
+.cloud::before,.cloud::after{content:"";position:absolute;background:#fff;border-radius:50%}
+.c1{width:150px;height:44px;top:28px;left:3%}.c1::before{width:62px;height:62px;top:-30px;left:22px}.c1::after{width:44px;height:44px;top:-18px;right:18px}
+.c2{width:120px;height:36px;top:64px;right:4%}.c2::before{width:50px;height:50px;top:-24px;left:18px}.c2::after{width:36px;height:36px;top:-14px;right:14px}
+.spark{position:absolute;font-size:22px;animation:tw 1.8s ease-in-out infinite alternate;pointer-events:none}
+@keyframes tw{from{transform:scale(.8) rotate(-8deg);opacity:.6}to{transform:scale(1.25) rotate(10deg);opacity:1}}
+
+/* ===== LAYOUT FOR 14" LAPTOP : fills screen, no scroll ===== */
+.wrap{width:min(1240px,98vw);height:min(900px,98vh);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;position:relative;z-index:2;padding:6px 0}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.tab{border:3px solid #fff;cursor:pointer;padding:8px 18px;border-radius:999px;font-weight:900;font-size:16px;letter-spacing:.2px;color:#7C2D12;background:#fff;box-shadow:0 4px 0 rgba(0,0,0,.15);transition:.15s}
+.tab small{opacity:.75;font-weight:800}
+.tab.active{background:var(--ink);color:#fff;border-color:var(--yellow);transform:translateY(-2px);box-shadow:0 6px 0 rgba(0,0,0,.2)}
+.tab[data-mode="all"]{background:#fff}.tab[data-mode="all"].active{background:#1E2A4A}
+.tab[data-mode="yesno"]{background:#DBEAFE}.tab[data-mode="yesno"].active{background:#2563EB}
+.tab[data-mode="wh"]{background:#FCE7F3}.tab[data-mode="wh"].active{background:#DB2777}
+.tab[data-mode="more"]{background:#FEF3C7}.tab[data-mode="more"].active{background:#D97706}
+
+/* ===== CAMERA ===== */
+.camera{
+  width:min(1180px,97vw); background:linear-gradient(180deg,#fff 0 118px,#38BDF8 118px 78%,#FFD93D 78% 100%);
+  border:5px solid #111827; border-radius:42px; position:relative;
+  box-shadow:0 18px 0 #0EA5E9,0 30px 50px rgba(2,132,199,.45), inset 0 2px 0 #fff;
+  padding:0 22px 14px; transition:transform .08s;
+}
+.camera.shake{animation:shake .38s ease}
+@keyframes shake{0%,100%{transform:translateX(0) rotate(0)}20%{transform:translateX(-7px) rotate(-.6deg)}40%{transform:translateX(7px) rotate(.6deg)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
+.camera-top{height:54px;display:flex;align-items:flex-end;justify-content:space-between;padding:0 6px;position:relative}
+.top-left{width:150px;height:38px;background:var(--pink);border:4px solid #111827;border-bottom:none;border-radius:18px 18px 0 0;position:relative;top:5px}
+.top-left::after{content:"";position:absolute;left:26px;top:7px;width:8px;height:20px;background:#111827;border-radius:99px;box-shadow:28px 0 #111827,56px 0 #111827}
+.handle{width:300px;height:52px;background:var(--blue);border:5px solid #111827;border-bottom:none;border-radius:22px 22px 0 0;display:flex;justify-content:center;align-items:flex-end;padding-bottom:0}
+.handle-inner{width:150px;height:30px;background:#FEF3C7;border:4px solid #111827;border-bottom:none;border-radius:14px 14px 0 0;background:linear-gradient(180deg,#E0F2FE,#FFFBEB)}
+.shutter{
+  width:238px;min-height:58px;background:linear-gradient(180deg,#FFE066,#FFC93C);border:4px solid #111827;border-radius:18px;
+  font-family:inherit;font-weight:1000;font-size:19px;color:#111827;cursor:pointer;
+  box-shadow:0 6px 0 #B45309, inset 0 2px 0 #fff; position:relative;top:8px; line-height:1.05; padding:8px 10px;
+}
+.shutter small{display:block;font-size:11px;letter-spacing:2.5px;font-weight:900}
+.shutter:hover{filter:brightness(1.06)} .shutter:active{transform:translateY(4px);box-shadow:0 2px 0 #B45309}
+.shutter.ready{animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{box-shadow:0 6px 0 #B45309,0 0 0 0 rgba(255,217,61,.8)}50%{box-shadow:0 6px 0 #B45309,0 0 0 12px rgba(255,217,61,0)}}
+.camera-head{display:flex;align-items:center;justify-content:center;gap:14px;padding:8px 10px 10px;position:relative}
+.camera-head h1{font-size:52px;line-height:.95;font-weight:1000;letter-spacing:-.5px;color:#111827;text-shadow:3px 3px 0 #FEF08A}
+.burst{color:#F59E0B;font-size:28px}
+.badge{position:absolute;right:8px;top:8px;background:var(--pink);color:#fff;border:3px solid #111827;border-radius:12px;padding:7px 10px;font-weight:1000;font-size:13px;line-height:1;text-align:center;transform:rotate(2deg);box-shadow:3px 3px 0 #111827}
+.badge span{font-size:10px;letter-spacing:1px}
+.camera-mid{display:flex;align-items:center;gap:14px}
+.lens{flex:0 0 92px;width:92px;height:92px;border-radius:50%;background:radial-gradient(circle at 32% 30%,#FFC2D1 0 18%,#FF5D8F 19% 62%,#E11D48 63%);border:5px solid #111827;box-shadow:inset 0 -8px 0 rgba(0,0,0,.15),0 4px 0 rgba(0,0,0,.2)}
+.lens.small{flex-basis:92px}
+.screen-wrap{flex:1;display:flex;justify-content:center}
+.screen{
+  width:100%;max-width:820px;background:#111827;border-radius:24px;padding:10px;
+  box-shadow:inset 0 0 0 3px #374151, 0 8px 24px rgba(0,0,0,.25);
+}
+.screen-inner{
+  background:#fff;border-radius:16px;overflow:hidden;min-height:472px;display:flex;flex-direction:column;
+  background-image:radial-gradient(#FEF3C7 1px,transparent 1px);background-size:22px 22px;
+}
+.screen-inner.slide{animation:slideIn .38s ease}
+@keyframes slideIn{from{transform:translateX(36px);opacity:0}to{transform:translateX(0);opacity:1}}
+.screen-top{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 14px 6px}
+.tag{background:#111827;color:#FFD93D;padding:6px 12px;border-radius:999px;font-size:13px;font-weight:1000;letter-spacing:.4px;text-transform:uppercase}
+.meta{font-weight:900;font-size:15px;color:#475569}
+.score{font-weight:1000;background:#FEF3C7;border:2px solid #F59E0B;padding:5px 10px;border-radius:999px;font-size:15px}
+.qarea{display:flex;gap:14px;align-items:center;padding:4px 16px 2px}
+.illus{flex:0 0 118px;width:118px;height:104px;background:linear-gradient(180deg,#E0F2FE,#FEF9C3);border:3px solid #111827;border-radius:18px;display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:4px 4px 0 #111827}
+.illus .emoji{font-size:56px;line-height:1;filter:drop-shadow(0 3px 0 rgba(0,0,0,.12))}
+.illus .word{font-size:12px;font-weight:1000;letter-spacing:1.5px;color:#0369A1;margin-top:4px;text-transform:uppercase}
+.question{font-size:30px;line-height:1.18;font-weight:1000;color:#111827}
+.question .blank{color:#DB2777;text-decoration:underline;text-underline-offset:5px}
+.hint{font-size:15px;font-weight:700;color:#64748B;margin-top:6px}
+.choices{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:10px 14px 8px}
+.choice{
+  font-family:inherit;text-align:left;background:#fff;border:3px solid #111827;border-radius:16px;padding:13px 14px;
+  font-size:20px;font-weight:900;cursor:pointer;display:flex;gap:10px;align-items:center;box-shadow:0 4px 0 #111827;transition:.12s;min-height:58px;line-height:1.15
+}
+.choice:hover{transform:translateY(-2px);background:#FFFBEB}
+.choice .letter{flex:0 0 36px;width:36px;height:36px;border-radius:50%;display:grid;place-items:center;color:#fff;font-size:17px;border:2px solid #111827}
+.choice:nth-child(1) .letter{background:#38BDF8}.choice:nth-child(2) .letter{background:#FF8FAB}.choice:nth-child(3) .letter{background:#F59E0B}.choice:nth-child(4) .letter{background:#22C55E}
+.choice.correct{background:#DCFCE7;border-color:#15803D;box-shadow:0 4px 0 #15803D}
+.choice.wrong{background:#FEE2E2;border-color:#DC2626;box-shadow:0 4px 0 #DC2626;animation:wob .3s}
+@keyframes wob{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.choice:disabled{cursor:default;opacity:.92}
+.explain{margin:2px 14px 12px;border-radius:14px;padding:10px 13px;font-size:16.5px;line-height:1.35;font-weight:700;display:none}
+.explain.show{display:block}
+.explain.good{background:#F0FDF4;border:2px solid #22C55E;color:#14532D}
+.explain.bad{background:#FFF7ED;border:2px solid #F97316;color:#7C2D12}
+.explain b{font-size:17px}
+.camera-foot{display:flex;justify-content:space-between;align-items:center;gap:12px;padding-top:10px}
+.pill{display:flex;align-items:center;gap:9px;background:#fff;border:3px solid #111827;border-radius:999px;padding:7px 16px 7px 7px;font-size:21px;font-weight:1000;box-shadow:0 3px 0 #111827}
+.pill .icon{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;color:#fff;font-size:20px}
+.pill.yes .icon{background:var(--green)} .pill.no .icon{background:#E11D48}
+.credit{font-size:12px;font-weight:800;color:#92400E;text-align:center}
+.restart{background:#fff;border:3px solid #111827;border-radius:999px;padding:8px 14px;font-family:inherit;font-weight:1000;cursor:pointer;box-shadow:0 3px 0 #111827}
+#flash{position:fixed;inset:0;background:#fff;opacity:0;pointer-events:none;z-index:50}
+#flash.on{animation:flash .45s ease}
+@keyframes flash{0%{opacity:0}12%{opacity:.96}100%{opacity:0}}
+/* Polaroid modal */
+.overlay{position:fixed;inset:0;background:rgba(15,23,42,.62);backdrop-filter:blur(4px);display:none;place-items:center;z-index:60;padding:16px}
+.overlay.show{display:grid}
+.polaroid{background:#fff;width:min(480px,94vw);padding:18px 18px 14px;border-radius:8px;box-shadow:0 24px 60px rgba(0,0,0,.4);transform:rotate(-2deg);text-align:center}
+.polaroid .photo{background:linear-gradient(180deg,#7DD3FC,#FEF9C3);border-radius:6px;padding:22px 10px;border:2px solid #E5E7EB}
+.polaroid .photo .big{font-size:72px}
+.polaroid h2{font-size:32px;margin:10px 0 2px}
+.polaroid .score-big{font-size:44px;font-weight:1000;color:#DB2777}
+.polaroid p{font-weight:700;color:#475569;font-size:16px;line-height:1.4}
+.polaroid .stars{font-size:28px;letter-spacing:4px;margin:6px 0}
+.polaroid .actions{display:flex;gap:10px;justify-content:center;margin-top:12px;flex-wrap:wrap}
+.btn{font-family:inherit;border:3px solid #111827;border-radius:999px;padding:11px 18px;font-weight:1000;font-size:16px;cursor:pointer;box-shadow:0 4px 0 #111827}
+.btn.primary{background:var(--yellow)} .btn.pink{background:var(--pink);color:#fff}
+.caption{font-family:"Comic Sans MS",cursive;font-size:15px;color:#64748B;margin-top:8px}
+@media (max-width:900px){.camera-head h1{font-size:38px}.question{font-size:24px}.lens{display:none}.choices{grid-template-columns:1fr}.screen-inner{min-height:auto}.shutter{width:190px;font-size:16px}}
+</style>
+</head>
+<body>
+<div class="cloud c1"></div><div class="cloud c2"></div>
+<span class="spark" style="top:12%;left:6%">✨</span><span class="spark" style="top:18%;right:7%;animation-delay:.5s">⭐</span><span class="spark" style="bottom:10%;left:5%;animation-delay:.9s">💖</span><span class="spark" style="bottom:14%;right:6%;animation-delay:.3s">✨</span>
+<div id="flash"></div>
+
+<div class="wrap">
+  <div class="tabs" role="tablist" aria-label="Question mode">
+    <button class="tab active" data-mode="all">📸 All 50 <small>• Full Game</small></button>
+    <button class="tab" data-mode="yesno">✅ Yes / No Qs <small>• 17</small></button>
+    <button class="tab" data-mode="wh">❓ Wh- Qs <small>• 16</small></button>
+    <button class="tab" data-mode="more">⭐ More Can <small>• 17</small></button>
+  </div>
+
+  <main class="camera" id="camera">
+    <div class="camera-top">
+      <div class="top-left" aria-hidden="true"></div>
+      <div class="handle" aria-hidden="true"><div class="handle-inner"></div></div>
+      <button class="shutter ready" id="nextBtn" title="Next Question">📸 Next ➔<small>SHUTTER • NEXT QUESTION</small></button>
+    </div>
+
+    <div class="camera-head">
+      <span class="burst">✦✦</span><h1>Can you...?</h1><span class="burst">✦✦</span>
+      <div class="badge">CAN MASTER<br><span>ENGLISH FOR KIDS ★ GRADE 7</span></div>
+    </div>
+
+    <div class="camera-mid">
+      <div class="lens" aria-hidden="true"></div>
+      <div class="screen-wrap">
+        <section class="screen" aria-live="polite">
+          <div class="screen-inner" id="screenInner">
+            <div class="screen-top">
+              <span class="tag" id="tag">Yes / No Question</span>
+              <span class="meta" id="progress">Question 1 / 50</span>
+              <span class="score" id="scoreBox">⭐ Score: 0</span>
+            </div>
+            <div class="qarea">
+              <div class="illus"><div class="emoji" id="emoji">🚴</div><div class="word" id="illusWord">RIDE</div></div>
+              <div>
+                <div class="question" id="questionText"></div>
+                <div class="hint" id="hint">Tap the best answer — then press the yellow SHUTTER button for the next photo! 📸</div>
+              </div>
+            </div>
+            <div class="choices" id="choices"></div>
+            <div class="explain" id="explain"></div>
+          </div>
+        </section>
+      </div>
+      <div class="lens" aria-hidden="true"></div>
+    </div>
+
+    <div class="camera-foot">
+      <div class="pill yes"><span class="icon">✓</span> Yes, I can</div>
+      <div style="text-align:center">
+        <div class="credit">★ Can + subject + base verb …? &nbsp;•&nbsp; Can = 會 / 可以 / 能夠 ★</div>
+        <button class="restart" id="restartBtn">↺ Restart this mode</button>
+      </div>
+      <div class="pill no"><span class="icon">✕</span> No, I can’t</div>
+    </div>
+  </main>
+  <div style="font-weight:800;color:#075985;font-size:13px">Tip for teachers: Project on a 14″ laptop / interactive display — everything fits on one screen, no scrolling. Keyboard: 1–4 to answer, Enter / → for Next.</div>
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="polaroid">
+    <div class="photo"><div class="big" id="finalEmoji">🏆</div><div style="font-weight:1000;font-size:18px">SNAP! You finished!</div></div>
+    <h2>Your Polaroid Score Card</h2>
+    <div class="score-big" id="finalScore">42 / 50</div>
+    <div class="stars" id="finalStars">⭐⭐⭐</div>
+    <p id="finalMsg"></p>
+    <div class="caption">— Keep practising: Can you speak English? Yes, I can! 💖 —</div>
+    <div class="actions">
+      <button class="btn primary" id="againBtn">↺ Play Again</button>
+      <button class="btn pink" id="allBtn">📸 Try All 50</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const QUESTIONS=[
+/* ===== Yes/No : 17 ===== */
+{c:"yesno",tag:"Yes / No Question",emoji:"🚴",word:"Ride",q:"______ you ride a bike?",choices:["Can","Do","Are","Is"],a:0,exp:"<b>Can + subject + base verb?</b> Ability questions start with <b>Can</b>: Can you ride a bike? — Yes, I can."},
+{c:"yesno",tag:"Short Answer",emoji:"🏊",word:"Swim",q:"Can she swim?",choices:["Yes, she does.","Yes, she can.","Yes, she is.","Yes, she swims."],a:1,exp:"<b>Short answer mirrors ‘can’:</b> Can she…? → <b>Yes, she can.</b> Don’t use does / is, and don’t repeat the verb."},
+{c:"yesno",tag:"Short Answer",emoji:"⚽",word:"Soccer",q:"Can they play soccer?",choices:["No, they can.","No, they doesn’t.","No, they can't.","No, they aren't."],a:2,exp:"<b>No, they can't.</b> ‘They’ stays ‘they’ in the short answer. Negative of can = <b>can't</b>."},
+{c:"yesno",tag:"Pronoun Change",emoji:"🚗",word:"Drive",q:"Can your dad drive a car?",choices:["Yes, she can.","Yes, it can.","Yes, they can.","Yes, he can."],a:3,exp:"<b>Your dad = he.</b> So the short answer is <b>Yes, he can</b> — change the noun to the right pronoun."},
+{c:"yesno",tag:"Yes / No Question",emoji:"🗣️",word:"Speak",q:"______ he speak Japanese?",choices:["Does","Is","Can","Are"],a:2,exp:"<b>Can he speak…?</b> Can + subject + <b>base verb</b> (speak, not speaks)."},
+{c:"yesno",tag:"Pronoun Change",emoji:"📖",word:"Read",q:"Can Mary read this book?",choices:["Yes, she can.","Yes, he can.","Yes, it can.","Yes, you can."],a:0,exp:"<b>Mary = she.</b> Can Mary…? → <b>Yes, she can.</b>"},
+{c:"yesno",tag:"Pronoun Change",emoji:"🐶",word:"Run",q:"Can the dog run fast?",choices:["Yes, she can.","Yes, he can.","Yes, it can.","Yes, they can."],a:2,exp:"<b>Animals / things = it.</b> The dog → <b>Yes, it can.</b>"},
+{c:"yesno",tag:"Pronoun Change",emoji:"🎤",word:"Sing",q:"Can Tom and Amy sing?",choices:["Yes, he can.","Yes, she can.","Yes, it can.","Yes, they can."],a:3,exp:"<b>Two people = they.</b> Tom and Amy → <b>Yes, they can.</b>"},
+{c:"yesno",tag:"Short Answer",emoji:"🏆",word:"Win",q:"Can we win the game?",choices:["Yes, we can.","Yes, you can.","Yes, they can.","Yes, I can."],a:0,exp:"<b>We → we.</b> Can we…? answered by the group: <b>Yes, we can.</b>"},
+{c:"yesno",tag:"Short Answer",emoji:"🌳",word:"Climb",q:"Can he climb that tree?",choices:["No, he can.","No, he can't.","No, he doesn't.","No, he isn't."],a:1,exp:"<b>No, he can't.</b> Use can't for a negative short answer with can."},
+{c:"yesno",tag:"Base Verb Rule",emoji:"🇬🇧",word:"English",q:"Can you ______ English?",choices:["speaks","speaking","spoke","speak"],a:3,exp:"<b>After can, use the base verb:</b> can + <b>speak</b> (no -s, no -ing, no past tense)."},
+{c:"yesno",tag:"Short Answer",emoji:"🎹",word:"Piano",q:"Can she play the piano?",choices:["Yes, she cans.","Yes, she can.","Yes, she does play.","Yes, she can plays."],a:1,exp:"<b>Can never takes -s:</b> ‘she can’ — not ‘she cans’. Short answers are just <b>Yes, she can.</b>"},
+{c:"yesno",tag:"Short Answer",emoji:"💃",word:"Dance",q:"Can they dance?",choices:["No, they can't.","No, they can.","No, they aren't.","No, they don't can."],a:0,exp:"<b>No, they can't.</b> Never say ‘don't can’ — can makes its own negative: can't."},
+{c:"yesno",tag:"Pronoun Change",emoji:"🍳",word:"Cook",q:"Can your mom cook dinner?",choices:["Yes, he can.","Yes, she can.","Yes, it can.","Yes, they can."],a:1,exp:"<b>Your mom = she.</b> → <b>Yes, she can.</b>"},
+{c:"yesno",tag:"Pronoun Change",emoji:"🐸",word:"Jump",q:"Can it jump high?  (the frog)",choices:["Yes, they can.","Yes, he can.","Yes, it can.","Yes, we can."],a:2,exp:"<b>It → it.</b> Can it…? → <b>Yes, it can.</b>"},
+{c:"yesno",tag:"Short Answer",emoji:"🏊",word:"Swim",q:"A: Can you swim? &nbsp; B: ______ I need lessons.",choices:["Yes, I can.","No, I can't.","Yes, I do.","No, I'm not."],a:1,exp:"<b>‘I need lessons’ = negative meaning</b>, so: <b>No, I can't.</b> You → I when you answer for yourself."},
+{c:"yesno",tag:"Short Answer",emoji:"🐦",word:"Fly",q:"Can birds fly?",choices:["Yes, it can.","Yes, she can.","Yes, they can.","Yes, we can."],a:2,exp:"<b>Birds (plural) = they.</b> → <b>Yes, they can.</b>"},
+
+/* ===== Wh- : 16 ===== */
+{c:"wh",tag:"Wh- Question • What",emoji:"🎒",word:"What",q:"______ can you do after school?",choices:["Where","What","Who","How old"],a:1,exp:"<b>What = 什麼 (thing / activity).</b> What can you do…? asks about an activity."},
+{c:"wh",tag:"Wh- Question • Where",emoji:"📚",word:"Where",q:"______ can we meet? — At the library.",choices:["When","Who","Where","What"],a:2,exp:"<b>Where = 哪裡 (place).</b> The answer ‘At the library’ is a place, so ask with <b>Where</b>."},
+{c:"wh",tag:"Wh- Question • Who",emoji:"🙋",word:"Who",q:"______ can help us? — Mr. Chen can.",choices:["Who","What","Where","How"],a:0,exp:"<b>Who = 誰 (person).</b> Who can help us? asks about a person."},
+{c:"wh",tag:"Wh- Question • When",emoji:"📞",word:"When",q:"______ can I call you? — At 7 p.m.",choices:["Where","What","Who","When"],a:3,exp:"<b>When = 何時 (time).</b> The answer is a time, so use <b>When can I call you?</b>"},
+{c:"wh",tag:"Wh- Question • How",emoji:"🚇",word:"How",q:"______ can we get to Taipei 101? — By MRT.",choices:["What","How","Who","When"],a:1,exp:"<b>How = 如何 (way / method).</b> ‘By MRT’ tells the way, so ask <b>How can we get…?</b>"},
+{c:"wh",tag:"Word Order",emoji:"🎾",word:"Order",q:"What ______ she play? — Tennis.",choices:["can","does can","is","cans"],a:0,exp:"<b>Wh- + can + subject + base verb:</b> What <b>can</b> she play? Can never becomes ‘cans’."},
+{c:"wh",tag:"Base Verb Rule",emoji:"🚶",word:"Go",q:"Where can he ______?",choices:["goes","go","going","went"],a:1,exp:"<b>After can, base verb only:</b> Where can he <b>go</b>?"},
+{c:"wh",tag:"Base Verb Rule",emoji:"🎸",word:"Play",q:"Who can ______ the guitar?",choices:["plays","playing","play","played"],a:2,exp:"<b>Who can + base verb:</b> Who can <b>play</b> the guitar?"},
+{c:"wh",tag:"Wh- Answer",emoji:"🦅",word:"Fly",q:"What can a bird do?",choices:["It can fly.","It cans fly.","It can flies.","It does fly can."],a:0,exp:"<b>It can fly.</b> Subject + can + base verb. No -s on can, no -s on fly."},
+{c:"wh",tag:"Word Order",emoji:"🎫",word:"Tickets",q:"Choose the CORRECT question:",choices:["Where I can buy tickets?","Where can I buy tickets?","Where can I buys tickets?","Can where I buy tickets?"],a:1,exp:"<b>Where + can + I + buy…?</b> Wh-word first, then can, then subject, then base verb."},
+{c:"wh",tag:"Wh- Question • How",emoji:"🙏",word:"Thanks",q:"How can you say “謝謝” in English?",choices:["You can say “Thank you.”","You cans say “Thank you.”","You can says “Thank you.”","Can you say is “Thank you.”"],a:0,exp:"<b>You can say…</b> — can + base verb (say). This is a very useful classroom question!"},
+{c:"wh",tag:"Wh- Answer",emoji:"🏀",word:"Play",q:"When can we play basketball?",choices:["At the gym.","After school.","By bus.","Mr. Lin can."],a:1,exp:"<b>When asks about time</b> → <b>After school.</b> ‘At the gym’ answers Where, ‘By bus’ answers How."},
+{c:"wh",tag:"Wh- Answer",emoji:"🎨",word:"Draw",q:"What can he do?",choices:["He can draw pictures.","He cans draw pictures.","He can draws pictures.","He does can draw."],a:0,exp:"<b>He can draw…</b> — he + can + base verb (draw, not draws)."},
+{c:"wh",tag:"Word Order",emoji:"🎤",word:"Sing",q:"Who ______ sing well? — Lisa can.",choices:["cans","can","does can","is can"],a:1,exp:"<b>Who can sing well?</b> Here ‘who’ is the subject, so it is Who + can + base verb directly."},
+{c:"wh",tag:"Wh- Question • How many",emoji:"🌏",word:"Languages",q:"How many languages ______ you speak?",choices:["are","does","can","is"],a:2,exp:"<b>How many + noun + can + subject + verb:</b> How many languages <b>can</b> you speak?"},
+{c:"wh",tag:"Wh- Question • What time",emoji:"🕗",word:"Time",q:"______ can you come? — At eight o'clock.",choices:["Where","Who","What time","How many"],a:2,exp:"<b>What time = 幾點.</b> For a clock time, ‘What time can you come?’ is clearer than ‘When’."},
+
+/* ===== More Can : 17 ===== */
+{c:"more",tag:"Permission • Can I…?",emoji:"🖊️",word:"Borrow",q:"______ I use your pen, please?",choices:["Am","Do","Can","Are"],a:2,exp:"<b>Permission: Can I…? = 我可以…嗎？</b> Can I use your pen, please? — Sure, you can."},
+{c:"more",tag:"Request • Can you…?",emoji:"🚪",word:"Open",q:"Can you ______ the door, please?",choices:["open","opens","opening","opened"],a:0,exp:"<b>Request: Can you + base verb, please?</b> Can you <b>open</b> the door, please?"},
+{c:"more",tag:"Negative • can't",emoji:"🏊",word:"Can't",q:"I ______ swim. I need a life jacket.",choices:["can","can't","am","do"],a:1,exp:"<b>Can't = 不會 / 不能.</b> ‘I need a life jacket’ shows the negative meaning: I <b>can't</b> swim."},
+{c:"more",tag:"Base Verb Rule",emoji:"💃",word:"Dance",q:"She can ______ very well.",choices:["dances","dancing","dance","danced"],a:2,exp:"<b>Golden rule: can + base verb.</b> She can <b>dance</b> — never ‘can dances’."},
+{c:"more",tag:"Base Verb Rule",emoji:"🇬🇧",word:"Speak",q:"He can ______ English.",choices:["speaks","speak","speaking","spoke"],a:1,exp:"<b>He can speak…</b> Even with he/she, the verb after can stays in base form: <b>speak</b>."},
+{c:"more",tag:"Negative • cannot",emoji:"⏰",word:"Be",q:"They cannot ______ late for school.",choices:["are","is","be","being"],a:2,exp:"<b>Cannot + base verb ‘be’:</b> They cannot <b>be</b> late. (be is the base form of am/is/are.)"},
+{c:"more",tag:"Permission • Answer",emoji:"🌳",word:"Go out",q:"Can I go out and play?",choices:["Sure, you can.","Yes, I do.","No, you aren't.","Sure, you does."],a:0,exp:"<b>Granting permission:</b> Can I…? → <b>Sure, you can.</b> (I in the question becomes you in the answer.)"},
+{c:"more",tag:"Request • Answer",emoji:"🤝",word:"Help",q:"Can you help me, please?",choices:["Of course.","Yes, I am.","No, I don't can.","Yes, I helps."],a:0,exp:"<b>Answering a request:</b> Can you help me? → <b>Of course.</b> / Sure! — friendly and natural."},
+{c:"more",tag:"Negative • can't",emoji:"🤫",word:"Quiet",q:"We can't ______ in the library. Please be quiet.",choices:["talks","talk","talking","talked"],a:1,exp:"<b>Can't + base verb:</b> We can't <b>talk</b> in the library."},
+{c:"more",tag:"Permission • You can",emoji:"🪑",word:"Sit",q:"You can ______ here. This seat is free.",choices:["sits","sitting","sit","sat"],a:2,exp:"<b>You can + base verb</b> gives permission: You can <b>sit</b> here."},
+{c:"more",tag:"Find the Mistake",emoji:"🔍",word:"Wrong?",q:"Which sentence is WRONG?",choices:["She can sing.","She can sings.","She can sing well.","Can she sing?"],a:1,exp:"<b>‘She can sings’ is wrong.</b> After can, never add -s: She can <b>sing</b>."},
+{c:"more",tag:"Request • Function",emoji:"🧂",word:"Pass",q:"“Can you pass me the salt, please?” — This sentence is a…",choices:["short answer","request (asking someone to do something)","Wh- question","negative sentence"],a:1,exp:"<b>Can you… please?</b> is a polite <b>request</b> — you are asking someone to do something for you."},
+{c:"more",tag:"Negative • can't",emoji:"🐟",word:"Fish",q:"Birds can fly, but fish ______.",choices:["can","can't fly","fly can","cans"],a:1,exp:"<b>Contrast with ‘but’:</b> Birds can fly, but fish <b>can't fly</b> — fish can swim!"},
+{c:"more",tag:"Permission • Can I…?",emoji:"✏️",word:"Eraser",q:"______ I borrow your eraser?",choices:["Can","Am","Do","Is"],a:0,exp:"<b>Can I borrow…? = 我可以借…嗎？</b> A polite permission question for the classroom."},
+{c:"more",tag:"Negative • Permission",emoji:"🎮",word:"Games",q:"He ______ play video games all day. Mom says no.",choices:["can","can't","cans","am"],a:1,exp:"<b>‘Mom says no’ = permission denied</b> → He <b>can't</b> play video games all day."},
+{c:"more",tag:"cannot = can't",emoji:"📝",word:"Full form",q:"The FULL form of “can't” is ______.",choices:["can nott","cannot","cannut","canot"],a:1,exp:"<b>can't = cannot</b> (one word). In speaking we usually use the short form: can't."},
+{c:"more",tag:"Base Verb Rule",emoji:"🍰",word:"Make",q:"Can she ______ a cake?",choices:["makes","making","made","make"],a:3,exp:"<b>Can she + base verb?</b> Can she <b>make</b> a cake? — Yes, she can."}
+];
+
+let mode="all", list=[], idx=0, score=0, answered=false, lockedCount=0;
+const $=id=>document.getElementById(id);
+const tagEl=$("tag"), progEl=$("progress"), scoreEl=$("scoreBox"), qEl=$("questionText"), emEl=$("emoji"), wordEl=$("illusWord"), chEl=$("choices"), exEl=$("explain"), inner=$("screenInner"), nextBtn=$("nextBtn");
+
+/* --- Sound: Web Audio, no external files --- */
+let AC=null; function ac(){ if(!AC) AC=new (window.AudioContext||window.webkitAudioContext)(); if(AC.state==="suspended") AC.resume(); return AC; }
+function tone(f,t0,d,type="sine",g=.18){ try{const a=ac(),o=a.createOscillator(),gn=a.createGain();o.type=type;o.frequency.value=f;o.connect(gn);gn.connect(a.destination);const s=a.currentTime+t0;gn.gain.setValueAtTime(g,s);gn.gain.exponentialRampToValueAtTime(.001,s+d);o.start(s);o.stop(s+d);}catch(e){} }
+function playCorrect(){ tone(523,0,.14); tone(659,.1,.14); tone(784,.2,.22); }
+function playWrong(){ tone(196,0,.22,"sawtooth",.12); tone(147,.08,.26,"sawtooth",.1); }
+function playShutter(){ // realistic ka-cha: two sharp noise clicks
+  try{ const a=ac();
+    [0,0.13].forEach((off,i)=>{ const len=a.sampleRate*0.05, buf=a.createBuffer(1,len,a.sampleRate), d=buf.getChannelData(0);
+      for(let n=0;n<len;n++) d[n]=(Math.random()*2-1)*(1-n/len);
+      const src=a.createBufferSource(); src.buffer=buf; const f=a.createBiquadFilter(); f.type="highpass"; f.frequency.value=i?1800:1200;
+      const g=a.createGain(); g.gain.value=i?.9:1; src.connect(f); f.connect(g); g.connect(a.destination); src.start(a.currentTime+off); });
+    tone(880,0,.05,"square",.05); tone(660,.13,.06,"square",.05);
+  }catch(e){}
+}
+function flashShake(){ const f=$("flash"); f.classList.remove("on"); void f.offsetWidth; f.classList.add("on");
+  const cam=$("camera"); cam.classList.remove("shake"); void cam.offsetWidth; cam.classList.add("shake"); }
+
+function setMode(m){ mode=m; document.querySelectorAll(".tab").forEach(t=>t.classList.toggle("active",t.dataset.mode===m));
+  list = m==="all" ? [...QUESTIONS] : QUESTIONS.filter(q=>q.c===m);
+  // gentle shuffle so replays feel fresh, All 50 keeps category order blocks shuffled within
+  list.sort(()=>Math.random()-.5);
+  idx=0; score=0; lockedCount=0; render(); }
+function render(){ answered=false; const q=list[idx]; if(!q) return;
+  tagEl.textContent=q.tag; progEl.textContent=`Question ${idx+1} / ${list.length}`; scoreEl.textContent=`⭐ Score: ${score}`;
+  emEl.textContent=q.emoji; wordEl.textContent=q.word;
+  qEl.innerHTML=q.q.replace(/______/g,'<span class="blank">______</span>');
+  $("hint").textContent = q.c==="yesno" ? "Yes/No magic: Can + subject + verb? → Yes, … can. / No, … can't. ✨" : q.c==="wh" ? "Wh- magic: What / Where / Who / When / How + can + subject + verb? ✨" : "More Can magic: permission, requests, can't — and always a BASE VERB after can! ✨";
+  chEl.innerHTML=""; exEl.className="explain"; exEl.innerHTML="";
+  inner.classList.remove("slide"); void inner.offsetWidth; inner.classList.add("slide");
+  nextBtn.classList.remove("ready");
+  const letters=["A","B","C","D"];
+  q.choices.forEach((txt,i)=>{ const b=document.createElement("button"); b.className="choice";
+    b.innerHTML=`<span class="letter">${letters[i]}</span><span>${txt}</span>`;
+    b.onclick=()=>answer(i,b); chEl.appendChild(b); });
+}
+function answer(i,btn){ if(answered) return; answered=true; lockedCount++;
+  const q=list[idx]; const buttons=[...chEl.children];
+  buttons.forEach(b=>b.disabled=true);
+  buttons[q.a].classList.add("correct");
+  if(i===q.a){ score++; playCorrect(); exEl.className="explain show good"; exEl.innerHTML=`🎉 <b>Correct! Great shot! 📸</b> &nbsp;${q.exp}`; }
+  else { btn.classList.add("wrong"); playWrong(); exEl.className="explain show bad"; exEl.innerHTML=`💡 <b>Not quite — the correct answer is “${q.choices[q.a]}”.</b> &nbsp;${q.exp}`; }
+  scoreEl.textContent=`⭐ Score: ${score}`;
+  nextBtn.classList.add("ready");
+  nextBtn.innerHTML = idx===list.length-1 ? `🏆 Finish ➔<small>SHUTTER • SEE YOUR POLAROID</small>` : `📸 Next ➔<small>SHUTTER • NEXT QUESTION</small>`;
+}
+function next(){ playShutter(); flashShake();
+  if(idx>=list.length-1){ setTimeout(showFinal,220); return; }
+  idx++; setTimeout(()=>{ render(); nextBtn.innerHTML=`📸 Next ➔<small>SHUTTER • NEXT QUESTION</small>`; },180);
+}
+function showFinal(){ const total=list.length, pct=Math.round(score/total*100);
+  $("finalScore").textContent=`${score} / ${total}  •  ${pct}%`;
+  $("finalStars").textContent = pct>=90?"⭐⭐⭐":pct>=70?"⭐⭐☆":pct>=50?"⭐☆☆":"☆☆☆";
+  $("finalEmoji").textContent = pct>=90?"🏆":pct>=70?"📸":pct>=50?"🌟":"🌱";
+  $("finalMsg").innerHTML = pct>=90?`Amazing, Can Master! You really <b>can</b> use “can”! 🎉<br>Ask your friend: “Can you speak English?”`:
+    pct>=70?`Great job! You <b>can</b> do it — just remember: <b>can + base verb</b>, always!`:
+    pct>=50?`Good try! Remember the golden rule: <b>Can + subject + base verb?</b> Play again and you will improve!`:
+    `Don’t give up! Start with Yes/No Qs, learn <b>Yes, I can / No, I can't</b>, then try again. You can do it! 💪`;
+  $("overlay").classList.add("show");
+}
+nextBtn.onclick=next;
+$("restartBtn").onclick=()=>{ playShutter(); flashShake(); setMode(mode); };
+document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>setMode(t.dataset.mode));
+$("againBtn").onclick=()=>{ $("overlay").classList.remove("show"); setMode(mode); };
+$("allBtn").onclick=()=>{ $("overlay").classList.remove("show"); setMode("all"); };
+document.addEventListener("keydown",e=>{ if($("overlay").classList.contains("show")) return;
+  if(["1","2","3","4"].includes(e.key)){ const b=chEl.children[Number(e.key)-1]; if(b && !answered) b.click(); }
+  if(e.key==="Enter"||e.key==="ArrowRight"){ next(); }});
+setMode("all");
+</script>
+</body>
+</html>
